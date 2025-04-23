@@ -1,24 +1,36 @@
-
 import streamlit as st
 import random
+from pathlib import Path
 
-st.set_page_config(page_title="Spin the Wheel", page_icon="🍀")
-st.title("🍀 Spin the Wheel!")
+st.set_page_config(page_title="Vælg en Pjerrot", page_icon="🤡")
+st.title("🤡 Vælg en Pjerrot og vind!")
 
-# Resultater og deres sandsynligheder
+# Præmier og deres sandsynligheder
 options = [
-    ("Du tabte... Prøv igen!", 0.7),
-    ("🍺 Tillykke! Du har vundet en valgfri drikkevare!", 0.2),
-    ("🚌 Du har vundet en turbillet!", 0.1)
+    ("💸 Tillykke! Du har vundet en turbillet!", 0.1),
+    ("🍺 Du har vundet en valgfri drikkevare!", 0.2),
+    ("❌ Desværre, du tabte. Prøv igen!", 0.7)
 ]
 
-def spin_wheel():
+def pick_result():
     outcomes, probabilities = zip(*options)
-    result = random.choices(outcomes, probabilities)[0]
-    return result
+    return random.choices(outcomes, probabilities)[0]
 
-if st.button("Spin hjulet 🌁"):
-    result = spin_wheel()
-    st.subheader(result)
-else:
-    st.write("Klik på knappen for at spinne hjulet!")
+# Vis tre klikbare billeder
+cols = st.columns(3)
+img_path = Path("pjerrot.png")
+
+if "choice" not in st.session_state:
+    st.session_state.choice = None
+
+for i, col in enumerate(cols):
+    if col.button(f"Vælg Pjerrot #{i+1}"):
+        st.session_state.choice = pick_result()
+
+    col.image(img_path, use_column_width=True)
+
+if st.session_state.choice:
+    st.markdown("---")
+    st.subheader(st.session_state.choice)
+    if st.button("Prøv igen"):
+        st.session_state.choice = None
